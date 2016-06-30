@@ -1,0 +1,5 @@
+{
+	"require": {
+        "davechild/textstatistics": "1.*"
+	}
+}
