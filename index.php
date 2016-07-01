@@ -51,8 +51,10 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 	}
 
 	echo '<p>Below is a list of the ' . $wpLimit . ' most recently added articles to the category "' .
-		$wpCatLink . '" on ' . $wpDomain . ', scored by readability based on the Flesch–Kincaid reading ease (least readable first).</p>';
-	echo '<ol>';
+		$wpCatLink . '" on ' . $wpDomain . ', scored by readability based on the ' .
+		'<a href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests">Flesch–Kincaid</a> ' .
+		'reading ease (least readable first).</p>'."\n";
+	echo '<ol>'."\n";
 	$wpCatArticles2 = array();
 	$wpCatArticlesScored = array();
 	foreach( $wpCatArticles as $wpCatArticle ) {
@@ -86,11 +88,11 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 	asort( $wpCatArticlesScored );
 
 	foreach( $wpCatArticlesScored as $wpCatArticleScored => $wpCatArticleScore ) {
-		$wpCatUrl = 'https://' . $wpDomain . '/wiki/' . $wpCatArticleScored;
+		$wpCatUrl = 'https://' . $wpDomain . '/wiki/' . str_replace( ' ', '_', $wpCatArticleScored );
 		echo '<li><a href="' . $wpCatUrl . '" title="' . $wpCatArticleScored . '">' .
-			$wpCatArticleScored . '</a> (score: ' . $wpCatArticleScore . ')</li>';
+			$wpCatArticleScored . '</a> (score: ' . $wpCatArticleScore . ')</li>'."\n";
 	}
-	echo '</ol>';
+	echo '</ol>'."\n";
 }
 
 ?>
@@ -111,8 +113,8 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 <label for="wplang">.wikipedia.org</label>
 </p>
 <p><input type="submit" value="Go" /></p>
-</fieldset>
 </form>
+</fieldset>
 <?php
 if( $cat ) {
 	executeTool( $cat, $lang, $limit );
