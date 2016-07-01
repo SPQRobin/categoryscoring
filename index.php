@@ -25,7 +25,7 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 		'format' => 'json',
 		'list' => 'categorymembers',
 		'cmtitle' => 'Category:' . $wpCat,
-		'cmlimit' => $wpLimit,
+		'cmlimit' => 500, // need to take a high number because non-articles are filtered out
 		'cmsort' => 'timestamp', // sort by most recent
 		// 'cmtype' => 'page', // unfortunately doesn't work together with cmsort=timestamp
 	);
@@ -47,7 +47,7 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 		return;
 	}
 
-	echo '<p>Below is a list of the most recently added articles to the category "' . $wpCatLink . '" on ' . $wpDomain . ', scored by readability based on the Flesch–Kincaid reading ease (least readable first).</p>';
+	echo '<p>Below is a list of the ' . $wpLimit . ' most recently added articles to the category "' . $wpCatLink . '" on ' . $wpDomain . ', scored by readability based on the Flesch–Kincaid reading ease (least readable first).</p>';
 	echo '<ol>';
 	$wpCatArticles2 = array();
 	$wpCatArticlesScored = array();
@@ -57,6 +57,7 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 			$wpCatArticles2[$wpCatArticle['pageid']] = $wpCatArticle['title'];
 		}
 	}
+	$wpCatArticles2 = array_slice( $wpCatArticles2, 0, $wpLimit );
 	// at this point we have an array $wpCatArticles2 with pageid => pagetitle
 	// now do an API request to get content extracts
 	$wpApiQueryParams2 = array(
@@ -103,7 +104,7 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 <input type="text" size="2" id="wplang" name="wplang" value="<?php echo $lang; ?>" style="text-align:center;" />
 <label for="wplang">.wikipedia.org</label>
 </p>
-<p><input type="submit" /></p>
+<p><input type="submit" value="Go" /></p>
 </fieldset>
 </form>
 <?php
