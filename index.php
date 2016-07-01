@@ -51,7 +51,8 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 	}
 
 	echo '<p>Below is a list of the ' . $wpLimit . ' most recently added articles to the category "' .
-		$wpCatLink . '" on ' . $wpDomain . ', scored by readability based on the ' .
+		$wpCatLink . '" on ' . $wpDomain . '.</p>';
+	echo '<p>It is scored by readability based on the ' .
 		'<a href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests">Flesch–Kincaid</a> ' .
 		'reading ease (least readable first).</p>'."\n";
 	echo '<ol>'."\n";
