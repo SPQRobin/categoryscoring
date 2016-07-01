@@ -1,14 +1,12 @@
 <?php
 
-error_reporting( -1 );
-ini_set( 'display_errors', 1 );
-
 require_once( __DIR__ . '/vendor/autoload.php' );
 
 use DaveChild\TextStatistics as TS;
 $textStatistics = new TS\TextStatistics;
 
-$languages = array( 'en', 'de', 'fr', 'nl' ); // this could be made into e.g. calling the API's siprop=languages
+// this could be made into e.g. calling the API's siprop=languages
+$languages = array( 'en', 'de', 'fr', 'nl' );
 
 $cat = isset( $_GET['wpcat'] ) ? $_GET['wpcat'] : '';
 $lang = isset( $_GET['wplang'] ) && in_array( $_GET['wplang'], $languages ) ? $_GET['wplang'] : 'en';
@@ -25,9 +23,12 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 		'format' => 'json',
 		'list' => 'categorymembers',
 		'cmtitle' => 'Category:' . $wpCat,
-		'cmlimit' => 500, // need to take a high number because non-articles are filtered out
-		'cmsort' => 'timestamp', // sort by most recent
-		// 'cmtype' => 'page', // unfortunately doesn't work together with cmsort=timestamp
+		// need to take a high number because non-articles are filtered out
+		'cmlimit' => 500,
+		// sort by most recent
+		'cmsort' => 'timestamp',
+		// unfortunately doesn't work together with cmsort=timestamp
+		// 'cmtype' => 'page',
 	);
 	$wpApiQuery = $wpApi . '?' . http_build_query( $wpApiQueryParams );
 	$wpCatArticles = file_get_contents( $wpApiQuery );
@@ -40,14 +41,17 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 
 	$wpCatArticles = $wpCatArticles['query']['categorymembers'];
 
-	$wpCatLink = '<a href="https://' . $wpDomain . '/wiki/Category:' . htmlspecialchars( $wpCat ) . '" title="Category:' . $wpCat . '">' . $wpCat . '</a>';
+	$wpCatLink = '<a href="https://' . $wpDomain . '/wiki/Category:' .
+		htmlspecialchars( $wpCat ) . '" title="Category:' . $wpCat . '">' . $wpCat . '</a>';
 
 	if( count( $wpCatArticles ) < 1 ) {
-		echo '<p>Sorry, we did not find articles in the category "' . $wpCatLink . '" on ' . $wpDomain . '! The category probably does not exist.</p>';
+		echo '<p>Sorry, we did not find articles in the category "' . $wpCatLink .
+			'" on ' . $wpDomain . '! The category probably does not exist.</p>';
 		return;
 	}
 
-	echo '<p>Below is a list of the ' . $wpLimit . ' most recently added articles to the category "' . $wpCatLink . '" on ' . $wpDomain . ', scored by readability based on the Flesch–Kincaid reading ease (least readable first).</p>';
+	echo '<p>Below is a list of the ' . $wpLimit . ' most recently added articles to the category "' .
+		$wpCatLink . '" on ' . $wpDomain . ', scored by readability based on the Flesch–Kincaid reading ease (least readable first).</p>';
 	echo '<ol>';
 	$wpCatArticles2 = array();
 	$wpCatArticlesScored = array();
@@ -73,8 +77,9 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 	$wpCatArticlesContent = json_decode( $wpCatArticlesContent, true );
 	$wpCatArticlesContent = $wpCatArticlesContent['query']['pages'];
 	foreach( $wpCatArticlesContent as $wpCatArticleContentId => $wpCatArticleContent ) {
-		$readabilityScore = $textStatistics->fleschKincaidReadingEase( $wpCatArticleContent['extract'] );
-		$wpCatArticlesScored[$wpCatArticleContent['title']] = $readabilityScore;
+		// get a readability score based on the article's intro
+		$score = $textStatistics->fleschKincaidReadingEase( $wpCatArticleContent['extract'] );
+		$wpCatArticlesScored[$wpCatArticleContent['title']] = $score;
 	}
 
 	// sort low number (low readability) to high number (high readability)
@@ -82,7 +87,8 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 
 	foreach( $wpCatArticlesScored as $wpCatArticleScored => $wpCatArticleScore ) {
 		$wpCatUrl = 'https://' . $wpDomain . '/wiki/' . $wpCatArticleScored;
-		echo '<li><a href="' . $wpCatUrl . '" title="' . $wpCatArticleScored . '">' . $wpCatArticleScored . '</a> (score: ' . $wpCatArticleScore . ')</li>';
+		echo '<li><a href="' . $wpCatUrl . '" title="' . $wpCatArticleScored . '">' .
+			$wpCatArticleScored . '</a> (score: ' . $wpCatArticleScore . ')</li>';
 	}
 	echo '</ol>';
 }
