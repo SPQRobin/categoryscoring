@@ -101,6 +101,7 @@ function executeTool( $wpCat, $wpLang, $wpLimit ) {
 <html>
 <head>
 <title>Wikipedia category scoring</title>
+<meta charset="UTF-8"/>
 </head>
 <body>
 <fieldset>
